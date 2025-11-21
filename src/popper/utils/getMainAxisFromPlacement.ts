@@ -1,4 +1,4 @@
-import { Axis, Placement } from "@floating-ui/core/src/types";
+import type { Axis, Placement } from "@floating-ui/core";
 
 import { getBasePlacement } from "./getBasePlacement";
 

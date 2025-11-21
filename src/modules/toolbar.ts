@@ -7,7 +7,7 @@ import {
   tokenClassNodeProp,
 } from "@codemirror/language";
 import { EditorState, StateField } from "@codemirror/state";
-import { SyntaxNode } from "@lezer/common/dist/tree";
+import { SyntaxNode } from "@lezer/common";
 import {
   App,
   BaseComponent,
@@ -30,6 +30,7 @@ import {
   markText,
   strikethroughText,
 } from "./defaultCommand";
+import { listEmojiPreserveExtension } from "./listEmojiPreserve";
 
 const getCursorTooltips = (state: EditorState, app: App): Tooltip | null => {
   const sel = state.selection.ranges[0];
@@ -88,7 +89,7 @@ export const cursorTooltipField = (app: App) => {
 };
 
 export const ToolBarExtension = (app: App) => {
-  return [cursorTooltipField(app)];
+  return [cursorTooltipField(app), listEmojiPreserveExtension()];
 };
 
 class SmallButton extends BaseComponent implements SBtnDef {
