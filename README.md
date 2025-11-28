@@ -1,4 +1,4 @@
-# Obsidian Inline Toolbar (Mini Toolbar)
+# Obsidian Inline Toolbar (List Helper)
 
 ## Intro
 
@@ -9,6 +9,8 @@
 >
 > His original
 > repo: [https://github.com/aidenlx/obsidian-mini-toolbar](https://github.com/Aidenlx/Obsidian-Mini-Toolbar)
+>
+> Current repository: [https://github.com/MaximilianMauroner/obsidian-list-helper](https://github.com/MaximilianMauroner/obsidian-list-helper)
 
 ## How to use
 
@@ -19,12 +21,12 @@
 ### From BRAT
 
 To install a pre-release, download and enable the [Obsidian42 BRAT](https://github.com/TfTHacker/obsidian42-brat)
-plugin, add the beta repository `quorafind/obsidian-mini-toolbar`, and then have BRAT check for updates.
+plugin, add the beta repository `MaximilianMauroner/obsidian-list-helper`, and then have BRAT check for updates.
 
 ### From GitHub
 
-1. Download the Latest Release from the Releases section of the GitHub Repository
-2. Put files to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-inline-toolbar`
+1. Download the Latest Release from the [Releases section](https://github.com/MaximilianMauroner/obsidian-list-helper/releases) of the GitHub Repository
+2. Put files to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-list-helper`
 3. Reload Obsidian
 4. If prompted about Safe Mode, you can disable safe mode and enable the plugin.
    Otherwise, head to Settings, third-party plugins, make sure safe mode is off and

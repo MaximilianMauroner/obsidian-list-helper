@@ -17,7 +17,7 @@ import {
 
 import { ToolBar } from "../modules/toolbar";
 import { tooltipConfig } from "./config";
-import { MiniToolbarEvtName, Tooltip } from "./define";
+import { ListHelperEvtName, Tooltip } from "./define";
 import { showTooltip } from "./index";
 import { shift } from "./shift";
 
@@ -129,7 +129,7 @@ class ViewPluginClass implements PluginValue {
     const from = view.editor.offsetToPos(info.start);
     const to = info.end ? view.editor.offsetToPos(info.end) : from;
     this.workspace.trigger(
-      MiniToolbarEvtName,
+      ListHelperEvtName,
       toolbar,
       { from, to },
       view.editor,

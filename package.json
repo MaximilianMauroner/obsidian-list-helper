@@ -1,6 +1,6 @@
 {
-  "name": "mini-toolbar",
-  "version": "0.0.3",
+  "name": "list-helper",
+  "version": "0.0.1",
   "description": "mini context toolbar in editor",
   "main": "",
   "types": "src/typings/index.d.ts",
@@ -16,8 +16,12 @@
     "release": "release-it"
   },
   "keywords": [],
-  "author": "AidenLx & Boninall",
+  "author": "AidenLx, Boninall & Maximilian",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaximilianMauroner/obsidian-list-helper.git"
+  },
   "devDependencies": {
     "@aidenlx/obsidian-icon-shortcodes": "^0.5.1",
     "@codemirror/language": "github:lishid/cm-language",
