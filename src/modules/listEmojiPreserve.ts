@@ -60,13 +60,26 @@ const isInList = (state: EditorState, pos: number): boolean => {
 };
 
 /**
+ * Extracts blockquote prefix from a line (e.g., "> ", "> > ", etc.)
+ * Returns the prefix string if found, empty string otherwise
+ */
+const extractBlockquotePrefix = (lineText: string): string => {
+  const blockquoteMatch = lineText.match(/^(>\s*)+/);
+  return blockquoteMatch ? blockquoteMatch[0] : "";
+};
+
+/**
  * Extracts the emoji from the start of a list item line
  * Returns the emoji string (with spacing) if found, null otherwise
  */
 const extractEmojiFromLine = (lineText: string): string | null => {
+  // Extract blockquote prefix if present
+  const blockquotePrefix = extractBlockquotePrefix(lineText);
+  const textAfterBlockquote = lineText.substring(blockquotePrefix.length);
+
   // Remove the bullet/number markdown (e.g., "- ", "* ", "1. ", "- [ ] ")
   // Match: optional spaces, then "- " or "* " or number with "." or "- [ ]" or "- [x]"
-  const listMarkerMatch = lineText.match(
+  const listMarkerMatch = textAfterBlockquote.match(
     /^\s*[-*]\s+|^\s*\d+\.\s+|^\s*[-*]\s*\[[ x]\]\s*/,
   );
 
@@ -75,7 +88,9 @@ const extractEmojiFromLine = (lineText: string): string | null => {
   }
 
   // Get text after the list marker
-  const textAfterMarker = lineText.substring(listMarkerMatch[0].length);
+  const textAfterMarker = textAfterBlockquote.substring(
+    listMarkerMatch[0].length,
+  );
 
   if (!textAfterMarker.trim()) {
     return null;
@@ -129,13 +144,18 @@ class EmojiPreservePlugin implements PluginValue {
         // Only process if we're in a list and on a new line
         if (isInList(update.state, cursorPos)) {
           const newLineText = line.text;
-          const listMarkerMatch = newLineText.match(
+          const blockquotePrefix = extractBlockquotePrefix(newLineText);
+          const textAfterBlockquote = newLineText.substring(
+            blockquotePrefix.length,
+          );
+          const listMarkerMatch = textAfterBlockquote.match(
             /^\s*[-*]\s+|^\s*\d+\.\s+|^\s*[-*]\s*\[[ x]\]\s*/,
           );
 
           if (listMarkerMatch) {
-            const insertPos = line.from + listMarkerMatch[0].length;
-            const textAfterMarker = newLineText.substring(
+            const fullPrefix = blockquotePrefix + listMarkerMatch[0];
+            const insertPos = line.from + fullPrefix.length;
+            const textAfterMarker = textAfterBlockquote.substring(
               listMarkerMatch[0].length,
             );
 
@@ -150,7 +170,12 @@ class EmojiPreservePlugin implements PluginValue {
                 const currentState = this.view.state;
                 const currentLine = currentState.doc.lineAt(cursorPos);
                 const currentLineText = currentLine.text;
-                const currentListMarker = currentLineText.match(
+                const currentBlockquotePrefix =
+                  extractBlockquotePrefix(currentLineText);
+                const currentTextAfterBlockquote = currentLineText.substring(
+                  currentBlockquotePrefix.length,
+                );
+                const currentListMarker = currentTextAfterBlockquote.match(
                   /^\s*[-*]\s+|^\s*\d+\.\s+|^\s*[-*]\s*\[[ x]\]\s*/,
                 );
 
@@ -158,9 +183,11 @@ class EmojiPreservePlugin implements PluginValue {
                   currentListMarker &&
                   !extractEmojiFromLine(currentLineText)
                 ) {
+                  const currentFullPrefix =
+                    currentBlockquotePrefix + currentListMarker[0];
                   const currentInsertPos =
-                    currentLine.from + currentListMarker[0].length;
-                  const currentTextAfter = currentLineText.substring(
+                    currentLine.from + currentFullPrefix.length;
+                  const currentTextAfter = currentTextAfterBlockquote.substring(
                     currentListMarker[0].length,
                   );
 
@@ -194,13 +221,18 @@ class EmojiPreservePlugin implements PluginValue {
 /**
  * Extracts the list marker (indentation + marker) from a line
  * Returns the marker string if found, null otherwise
+ * Includes blockquote prefix if present
  */
 const extractListMarker = (lineText: string): string | null => {
+  // Extract blockquote prefix if present
+  const blockquotePrefix = extractBlockquotePrefix(lineText);
+  const textAfterBlockquote = lineText.substring(blockquotePrefix.length);
+
   // Match: optional spaces, then "- " or "* " or number with "." or "- [ ]" or "- [x]"
-  const listMarkerMatch = lineText.match(
+  const listMarkerMatch = textAfterBlockquote.match(
     /^(\s*[-*]\s+|\s*\d+\.\s+|\s*[-*]\s*\[[ x]\]\s*)/,
   );
-  return listMarkerMatch ? listMarkerMatch[1] : null;
+  return listMarkerMatch ? blockquotePrefix + listMarkerMatch[1] : null;
 };
 
 /**
@@ -214,15 +246,12 @@ export const preserveEmojiOnNewLine = (view: EditorView): boolean => {
   const selection = state.selection.main;
   const pos = selection.from;
 
-  // Check if we're in a list
-  if (!isInList(state, pos)) {
-    return false;
-  }
-
   const line = state.doc.lineAt(pos);
   const lineText = line.text;
 
-  // Extract list marker from current line
+  // Extract list marker from current line (this handles blockquotes too)
+  // We check for list marker first, as it's more reliable than syntax tree
+  // for blockquoted lists
   const listMarker = extractListMarker(lineText);
   if (!listMarker) {
     return false;
